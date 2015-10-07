@@ -67,20 +67,17 @@ int GetHALosVariables ()
         osFile >> variableDescription;
         osFile.ignore(256, ':');
         getline (osFile, variableValue);
-        cpuSchedulingPolicies[i].quantumLengthMultiplier = 
-            atoi (variableValue.c_str ());
+        cpuSchedulingPolicies[i].quantumLengthMultiplier = atoi (variableValue.c_str ());
 
         osFile >> variableDescription;
         osFile.ignore(256, ':');
         getline (osFile, variableValue);
-        cpuSchedulingPolicies[i].contextSwitchesUntilMoveDown =
-            atoi (variableValue.c_str ());
+        cpuSchedulingPolicies[i].contextSwitchesUntilMoveDown = atoi (variableValue.c_str ());
 
         osFile >> variableDescription;
         osFile.ignore(256, ':');
         getline (osFile, variableValue);
-        cpuSchedulingPolicies[i].contextSwitchesUntilMoveUp =
-            atoi (variableValue.c_str ());
+        cpuSchedulingPolicies[i].contextSwitchesUntilMoveUp = atoi (variableValue.c_str ());
     }
 
     osFile.close ();

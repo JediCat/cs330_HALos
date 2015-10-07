@@ -172,7 +172,6 @@ void HandleCommand (string command, string arguments [], string type)
     result = CreateProcessImage (nextPid, command);
     if (result == "ok")
     {
-        cout << "Created successfully" << endl;
         if (type == "BACKGROUND_PROCESS")
         {
             SendReturnStatusToHALshell (itos (nextPid), "", result, "");
@@ -183,9 +182,17 @@ void HandleCommand (string command, string arguments [], string type)
             cpuProcess.type = type;
             cpuProcess.status = "NEW_PROCESS";
             cpuProcess.command = command;
+            cpuProcess.queueNo = 0;
+            cpuProcess.contextSwitches =
+                cpuSchedulingPolicies[0].contextSwitchesUntilMoveDown;
+            cpuProcess.direction = "DOWN";
             for (i = 0; i < MAX_COMMAND_LINE_ARGUMENTS; i ++)
             {
                 cpuProcess.arguments [i] = arguments [i];
+                if (arguments[i].substr(0, 9) == "priority=")
+                {
+                    cpuProcess.priority = atoi(arguments[i].substr(10).c_str());
+                }
             }
             cpuProcess.returnValue = "";
             SendMessageToHAL9000 (cpuProcess);
@@ -197,9 +204,16 @@ void HandleCommand (string command, string arguments [], string type)
             process.status = "NEW_PROCESS";
             process.command = command;
             process.queueNo = 0;
+            process.contextSwitches =
+                cpuSchedulingPolicies[0].contextSwitchesUntilMoveDown;
+            process.direction = "DOWN";
             for (i = 0; i < MAX_COMMAND_LINE_ARGUMENTS; i ++)
             {
-                process.arguments [i] = arguments [i];
+                process.arguments [0] = arguments [i];
+                if (arguments[i].substr(0, 9) == "priority=")
+                {
+                    cpuProcess.priority = atoi(arguments[i].substr(10).c_str());
+                }
             }
             cout << process.pid << " in queue " << process.queueNo << endl;
             process.returnValue = "";
@@ -219,7 +233,7 @@ void HandleFinishedProcess (bool okToScheduleNextProcess)
 {
     if (cpuProcess.type == "FOREGROUND_PROCESS")
     {
-       remove ((cpuProcess.pid + "_backingstore").c_str ());
+        remove ((cpuProcess.pid + "_backingstore").c_str ());
 	SendReturnStatusToHALshell (parameter1, parameter2, parameter3, parameter4);
     }
     if (readyQueue.IsEmpty ())
@@ -244,6 +258,7 @@ void HandleFinishedProcess (bool okToScheduleNextProcess)
 
 void HandleHAL9000Interrupt (bool okToScheduleNextProcess)
 {
+cout << parameter1 << endl;
     if (parameter1 == "QUANTUM_EXPIRED")
     {
         cpuProcess.systemCallFileIndex = -1;

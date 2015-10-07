@@ -116,8 +116,9 @@ processDescriptor ReadyQueueType::SetQueueNo(processDescriptor process)
 
 void ReadyQueueType::Enqueue (processDescriptor process)
 {
-    SetQueueNo(process);
+    process = SetQueueNo(process);
     int i = process.queueNo;
+cout << "Proccess to be enqueued in " << i << ": " << process.pid << endl;
 
     if (cpuSchedulingPolicies[i].type == "RR" ||
         cpuSchedulingPolicies[i].type == "FCFS")
@@ -135,9 +136,8 @@ void ReadyQueueType::Enqueue (processDescriptor process)
             queues[i].queue[j] = queues[i].queue[j / 2];
             j = j / 2;
         }
-        queues[i].queue[j / 2] = process;
+        queues[i].queue[j] = process;
     }
-    cout << "Enqueued pid: " << process.pid << endl;
     return;
 }
 
@@ -146,6 +146,7 @@ processDescriptor ReadyQueueType::Dequeue ()
     processDescriptor toReturn;
     for (int i = 0; i < NO_OF_READY_QUEUES; i++)
     {
+cout << i << ": "  << queues[i].length << endl;
         if (queues[i].length > 0)
         {
             if (cpuSchedulingPolicies[i].type == "RR" ||
@@ -157,14 +158,15 @@ processDescriptor ReadyQueueType::Dequeue ()
             }
             else if (cpuSchedulingPolicies[i].type == "P")
             {
+cout << "Is this where it's fucking up?\n";
                 toReturn = queues[i].queue[1];
                 queues[i].queue[1] = queues[i].queue[queues[i].length];
                 queues[i].length--;
                 processDescriptor temp = queues[i].queue[1];
                 int j = 1;
-                while (i * 2 <= queues[i].length)
+                while (j * 2 <= queues[i].length)
                 {
-                    int child = i * 2;
+                    int child = j * 2;
                     if (child != queues[i].length && queues[i].queue[child + 1].priority < queues[i].queue[child].priority)
                         child++;
                     if (queues[i].queue[child].priority < temp.priority)
@@ -175,6 +177,5 @@ processDescriptor ReadyQueueType::Dequeue ()
             }
         }
     }
-    cout << "Dequeued pid: " << toReturn.pid << endl;
     return toReturn;
 }
