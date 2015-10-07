@@ -212,7 +212,7 @@ void HandleCommand (string command, string arguments [], string type)
                 process.arguments [0] = arguments [i];
                 if (arguments[i].substr(0, 9) == "priority=")
                 {
-                    cpuProcess.priority = atoi(arguments[i].substr(10).c_str());
+                    process.priority = atoi(arguments[i].substr(10).c_str());
                 }
             }
             cout << process.pid << " in queue " << process.queueNo << endl;
@@ -258,7 +258,6 @@ void HandleFinishedProcess (bool okToScheduleNextProcess)
 
 void HandleHAL9000Interrupt (bool okToScheduleNextProcess)
 {
-cout << parameter1 << endl;
     if (parameter1 == "QUANTUM_EXPIRED")
     {
         cpuProcess.systemCallFileIndex = -1;
